@@ -27,7 +27,6 @@ jobs:
     - name: Push
       run: |
         git add .
-        git branch -d doc
         git push origin -d doc
         git checkout -b doc
         git config --global user.name "${{ env.CI_COMMIT_AUTHOR }}"
