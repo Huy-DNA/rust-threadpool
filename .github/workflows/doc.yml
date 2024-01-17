@@ -4,6 +4,10 @@ on:
   push:
     branch: [ "master" ]
 
+env: 
+  CI_COMMIT_MESSAGE: Continuous Integration Build Artifacts
+  CI_COMMIT_AUTHOR: Continuous Integration
+
 jobs:
   doc:
     runs-on: ubuntu-latest
@@ -15,11 +19,9 @@ jobs:
     - name: Generate docs
       run: rustdoc src/lib.rs
     - name: Push
-      uses: s0/git-publish-subdir-action@develop
-      env:
-        REPO: self
-        BRANCH: doc
-        FOLDER: doc
-        GITHUB_TOKEN: ${{ secrets.PAT }}
-        MESSAGE: "Doc push: ({sha}) {msg}"
+      run: |
+        git config --global user.name "${{ env.CI_COMMIT_AUTHOR }}"
+        git config --global user.email "username@users.noreply.github.com"
+        git commit -a -m "${{ env.CI_COMMIT_MESSAGE }}"
+        git push
     
