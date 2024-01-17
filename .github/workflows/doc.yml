@@ -20,6 +20,7 @@ jobs:
       run: rustdoc src/lib.rs
     - name: Clean
       run: |
+        shopt -s extglob
         rm -rf -v !("doc")
         mv doc/* .
         rm -rf doc
