@@ -9,8 +9,8 @@ use std::{
 /// An error struct specifying that a non-positive value has been
 /// passed to a caller
 ///
-/// ```rust,should_panic
-/// # use threadpool::ThreadPool;
+/// ```should_panic
+/// use threadpool::ThreadPool;
 /// fn main() {
 ///     ThreadPool::build(0).unwrap();
 /// } 
@@ -88,16 +88,17 @@ impl ThreadPool {
     ///
     /// This code panics
     ///
-    /// ```rust,should_panic
-    /// # use threadpool::ThreadPool;
+    /// ```should_panic
+    /// use threadpool::ThreadPool;
     /// fn main() {
     ///     ThreadPool::build(0).unwrap();
     /// }
+    /// ```
     ///
     /// Negative `thread_count` passed to `build` would not compile.
     ///
-    /// ```rust,compile_fail
-    /// # use threadpool::ThreadPool;
+    /// ```compile_fail
+    /// use threadpool::ThreadPool;
     /// fn main() {
     ///     ThreadPool::build(-1);
     /// }
@@ -155,7 +156,7 @@ impl Drop for ThreadPool {
     /// If one of the worker had panicked and thus, terminated prematurely,
     /// this method panics
     ///
-    /// ```rust,should_panic
+    /// ```should_panic
     /// # use threadpool::ThreadPool;
     /// fn main() {
     ///     let mut pool = ThreadPool::build(10).unwrap();
