@@ -168,7 +168,7 @@ impl Drop for ThreadPool {
         for worker in &mut self.workers {
             if let Some(thread) = worker.thread.take() {
                 thread.join().expect("Warning: Some workers seem to have panicked. \
-                                      This likely led to wrong behavior");
+                                      This likely has led to wrong behavior");
             }
         }
     }
