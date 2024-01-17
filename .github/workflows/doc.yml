@@ -19,7 +19,7 @@ jobs:
       env:
         REPO: self
         BRANCH: doc
-        FOLDER: /
+        FOLDER: doc
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         MESSAGE: "Doc push: ({sha}) {msg}"
     
