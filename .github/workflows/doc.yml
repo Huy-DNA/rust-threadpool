@@ -24,6 +24,19 @@ jobs:
         rm -rf -v !("doc") .github .gitignore
         mv doc/* .
         rm -rf doc
+    - name: Generate index.html
+      run: |
+        cat << EOF > index.html
+          <!DOCTYPE html>
+          <html lang="en">
+          <head>
+            <script>
+              window.location.href = './lib/index.html';
+            </script>
+          </head>
+          <body>
+          </body>
+        EOF
     - name: Push
       run: |
         git add .
