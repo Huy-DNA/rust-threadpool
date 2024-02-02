@@ -7,4 +7,4 @@ One more important thing I also learnt is to used Github Action to perform some 
 * Automatically generate documentation in the `doc` branch.
 * Deploy the rust doc automatically, although I couldn't do it with Github Action yet. The main difficulty with deploying was that it expects an `index.html` at top-level, so I had to craft up a script to generate a dummy `index.html` that automatically redirects to the real doc page.
 
-The doc is deployed here: https://huydna.github.io/rust-threadpool
+The doc is deployed here: https://huy-dna.github.io/rust-threadpool
