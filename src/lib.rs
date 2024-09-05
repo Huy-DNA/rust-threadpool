@@ -1,9 +1,8 @@
 use std::{
+    fmt,
+    sync::{mpsc, Arc, Mutex},
     thread,
     thread::JoinHandle,
-    fmt,
-    sync::{Arc, Mutex, mpsc},
-    panic,
 };
 
 /// An error struct specifying that a non-positive value has been
@@ -13,7 +12,7 @@ use std::{
 /// use threadpool::ThreadPool;
 /// fn main() {
 ///     ThreadPool::build(0).unwrap();
-/// } 
+/// }
 /// ```
 #[derive(Debug, Clone)]
 pub struct ThreadCountError {
@@ -23,7 +22,11 @@ pub struct ThreadCountError {
 
 impl fmt::Display for ThreadCountError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "{}: Invalid thread count: {}. Thread count must be a positive number.", self.caller, self.invalid_val)
+        write!(
+            f,
+            "{}: Invalid thread count: {}. Thread count must be a positive number.",
+            self.caller, self.invalid_val
+        )
     }
 }
 
@@ -49,7 +52,7 @@ impl Worker {
     ///
     /// # Caution
     ///
-    /// If a worker panics, other workers within the pool will panic 
+    /// If a worker panics, other workers within the pool will panic
     /// due to mutex poisoning and effectively the thread pool is dead.
     fn new(id: usize, receiver: Arc<Mutex<mpsc::Receiver<Job>>>) -> Worker {
         Worker {
@@ -72,7 +75,7 @@ impl Worker {
 
 /// A struct representing a thread pool
 pub struct ThreadPool {
-    workers: Vec<Worker>, 
+    workers: Vec<Worker>,
     job_sender: Option<mpsc::Sender<Job>>,
 }
 
@@ -103,25 +106,31 @@ impl ThreadPool {
     ///     ThreadPool::build(-1);
     /// }
     /// ```
-    /// 
+    ///
     pub fn build(thread_count: usize) -> Result<ThreadPool, ThreadCountError> {
         if thread_count <= 0 {
-            return Err(ThreadCountError { caller: "ThreadPool::new()", invalid_val: thread_count }); 
+            return Err(ThreadCountError {
+                caller: "ThreadPool::new()",
+                invalid_val: thread_count,
+            });
         }
-        
+
         let (job_sender, job_receiver) = mpsc::channel();
         let job_sender = Some(job_sender);
         let job_receiver = Arc::new(Mutex::new(job_receiver));
 
         let mut workers = Vec::with_capacity(thread_count);
-        
+
         for id in 0..thread_count {
             workers.push(Worker::new(id, job_receiver.clone()));
         }
 
-        Ok(ThreadPool{ workers, job_sender })
+        Ok(ThreadPool {
+            workers,
+            job_sender,
+        })
     }
-   
+
     /// Send a job to the thread pool to execute it
     ///
     /// # Arguments
@@ -136,13 +145,18 @@ impl ThreadPool {
     /// the thread pool can possibly be "dead" and will silently stop
     /// executing job
     ///
-    /// However, this can be detected if a panic is observed when the 
+    /// However, this can be detected if a panic is observed when the
     /// thread pool is dropped
     /// by panicking
-    pub fn execute<F>(&mut self, job: F) 
-        where F: FnOnce() + Send + 'static {
-        self.job_sender.as_ref().unwrap()
-                       .send(Box::new(job)).unwrap(); 
+    pub fn execute<F>(&mut self, job: F)
+    where
+        F: FnOnce() + Send + 'static,
+    {
+        self.job_sender
+            .as_ref()
+            .unwrap()
+            .send(Box::new(job))
+            .unwrap();
     }
 }
 
@@ -150,7 +164,7 @@ impl Drop for ThreadPool {
     /// Gracefully shutdown the thread pool
     ///
     /// Drop the job sender and wait for all threads to shutdown
-    /// 
+    ///
     /// # Panics
     ///
     /// If one of the worker had panicked and thus, terminated prematurely,
@@ -167,8 +181,10 @@ impl Drop for ThreadPool {
         drop(self.job_sender.take().unwrap());
         for worker in &mut self.workers {
             if let Some(thread) = worker.thread.take() {
-                thread.join().expect("Warning: Some workers seem to have panicked. \
-                                      This likely has led to wrong behavior");
+                thread.join().expect(
+                    "Warning: Some workers seem to have panicked. \
+                                      This likely has led to wrong behavior",
+                );
             }
         }
     }
